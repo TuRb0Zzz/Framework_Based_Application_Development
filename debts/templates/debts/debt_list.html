@@ -2,12 +2,36 @@
 {% block title %}Список долгов{% endblock %}
 {% block content %}
 <h2 class="mb-4">Все долги</h2>
-<ul class="list-group">
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <input type="text" name="q" class="form-control" placeholder="Поиск по должнику..." value="{{ query }}">
+    </div>
+    <div class="col-md-3">
+        <select name="status" class="form-select">
+            <option value="">Все статусы</option>
+            <option value="paid" {% if status == 'paid' %}selected{% endif %}>Оплаченные</option>
+            <option value="unpaid" {% if status == 'unpaid' %}selected{% endif %}>Неоплаченные</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="sort" class="form-select">
+            <option value="date" {% if sort_by == 'date' %}selected{% endif %}>Сортировка: по дате</option>
+            <option value="amount" {% if sort_by == 'amount' %}selected{% endif %}>Сортировка: по сумме</option>
+            <option value="debtor" {% if sort_by == 'debtor' %}selected{% endif %}>Сортировка: по имени</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-custom-black w-100">Применить</button>
+    </div>
+</form>
+
+<ul class="list-group mb-4">
     {% for debt in debts %}
     <li class="list-group-item d-flex justify-content-between align-items-center">
         <div>
             <a href="{% url 'debts:detail' debt.id %}" class="text-dark text-decoration-none fw-bold">
-                {{ debt.debtor_name }}
+                {{ debt.debtor.name }}
             </a>
             — {{ debt.amount }} руб.
         </div>
@@ -18,7 +42,24 @@
         {% endif %}
     </li>
     {% empty %}
-    <li class="list-group-item">Долгов пока нет.</li>
+    <li class="list-group-item">Долгов не найдено.</li>
     {% endfor %}
 </ul>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<nav>
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ query }}&status={{ status }}&sort={{ sort_by }}">Назад</a></li>
+        {% endif %}
+        
+        <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span></li>
+        
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ query }}&status={{ status }}&sort={{ sort_by }}">Вперед</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
 {% endblock %}

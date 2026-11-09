@@ -7,17 +7,27 @@
         <tr>
             <th>Должник</th>
             <th>Количество долгов</th>
-            <th>Общая сумма</th>
+            <th>Общая сумма (неоплаченные)</th>
         </tr>
     </thead>
     <tbody>
         {% for stat in statistics %}
         <tr>
-            <td>{{ stat.debtor_name }}</td>
+            <td>{{ stat.name }}</td>
             <td>{{ stat.debt_count }}</td>
-            <td>{{ stat.total_amount }} руб.</td>
+            <td>{{ stat.total_amount|default:0 }} руб.</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3" class="text-center">Данных нет.</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
+<div class="mt-4 p-3 bg-light border rounded">
+    <h4>Общая сводка:</h4>
+    <p class="mb-0"><strong>Всего неоплаченных долгов:</strong> {{ unpaid_count }}</p>
+    <p class="mb-0"><strong>Общая сумма всех долгов (включая оплаченные):</strong> {{ total_all }} руб.</p>
+</div>
 {% endblock %}
