@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Статистика{% endblock %}
+{% block content %}
+<h2 class="mb-4">Статистика по должникам</h2>
+<table class="table table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Должник</th>
+            <th>Количество долгов</th>
+            <th>Общая сумма</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for stat in statistics %}
+        <tr>
+            <td>{{ stat.debtor_name }}</td>
+            <td>{{ stat.debt_count }}</td>
+            <td>{{ stat.total_amount }} руб.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

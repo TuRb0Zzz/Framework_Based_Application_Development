@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Поиск долгов по имени должника</h2>
+<form method="get" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="q" class="form-control" placeholder="Введите имя..." value="{{ query }}">
+        <button class="btn btn-custom-black" type="submit">Найти</button>
+    </div>
+</form>
+{% if query %}
+    <h4>Результаты по запросу "{{ query }}":</h4>
+    <ul class="list-group">
+        {% for debt in results %}
+        <li class="list-group-item">{{ debt.debtor_name }} — {{ debt.amount }} руб.</li>
+        {% empty %}
+        <li class="list-group-item">Ничего не найдено.</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}

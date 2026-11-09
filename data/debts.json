@@ -1,0 +1,5 @@
+[
+  {"id": 1, "user_id": 1, "debtor_id": 1, "amount": 5000.0, "issue_date": "2026-09-01", "is_paid": false},
+  {"id": 2, "user_id": 1, "debtor_id": 2, "amount": 12000.0, "issue_date": "2026-09-10", "is_paid": true},
+  {"id": 3, "user_id": 1, "debtor_id": 1, "amount": 3000.0, "issue_date": "2026-10-01", "is_paid": false}
+]

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Список долгов{% endblock %}
+{% block content %}
+<h2 class="mb-4">Все долги</h2>
+<ul class="list-group">
+    {% for debt in debts %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+            <a href="{% url 'debts:detail' debt.id %}" class="text-dark text-decoration-none fw-bold">
+                {{ debt.debtor_name }}
+            </a>
+            — {{ debt.amount }} руб.
+        </div>
+        {% if debt.is_paid %}
+            <span class="badge bg-success rounded-pill">Оплачен</span>
+        {% else %}
+            <span class="badge bg-danger rounded-pill">Не оплачен</span>
+        {% endif %}
+    </li>
+    {% empty %}
+    <li class="list-group-item">Долгов пока нет.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

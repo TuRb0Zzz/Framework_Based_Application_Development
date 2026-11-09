@@ -1,0 +1,15 @@
+body {
+    background-color: #f8f9fa;
+}
+.list-group-item {
+    transition: background-color 0.2s ease;
+}
+.list-group-item:hover {
+    background-color: #e9ecef;
+}
+
+.btn-custom-black {
+    color: #000000;
+    background-color: transparent;
+    border: 1px solid #000000;
+}
