@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Sum, Count, Q
 from django.core.paginator import Paginator
@@ -5,16 +6,25 @@ from .models import Debt
 from debtors.models import Debtor
 
 def debt_list(request):
-    debts = Debt.objects.all()
+    debts = Debt.objects.select_related('debtor', 'user').all()
     query = request.GET.get('q', '')
     status = request.GET.get('status', '')
-    
+    date_str = request.GET.get('date', '')
+    error = None
+
     if query:
         debts = debts.filter(debtor__name__icontains=query)
     if status == 'paid':
         debts = debts.filter(is_paid=True)
     elif status == 'unpaid':
         debts = debts.exclude(is_paid=True)
+
+    if date_str:
+        try:
+            parsed_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            debts = debts.filter(issue_date=parsed_date)
+        except ValueError:
+            error = "Некорректный формат даты. Используйте ГГГГ-ММ-ДД."
 
     sort_by = request.GET.get('sort', 'date')
     sort_mapping = {
@@ -23,7 +33,6 @@ def debt_list(request):
         'debtor': 'debtor__name'
     }
     debts = debts.order_by(sort_mapping.get(sort_by, '-issue_date'))
-    debts = debts.select_related('debtor')
 
     paginator = Paginator(debts, 5)
     page_number = request.GET.get('page')
@@ -34,6 +43,8 @@ def debt_list(request):
         'page_obj': page_obj,
         'query': query,
         'status': status,
+        'date_str': date_str,
+        'error': error,
         'sort_by': sort_by,
     }
     return render(request, 'debts/debt_list.html', context)
@@ -55,7 +66,7 @@ def debt_stats(request):
     return render(request, 'debts/stats.html', context)
 
 def debt_detail(request, debt_id):
-    debt = get_object_or_404(Debt.objects.select_related('debtor'), pk=debt_id)
+    debt = get_object_or_404(Debt.objects.select_related('debtor', 'user'), pk=debt_id)
     return render(request, 'debts/debt_detail.html', {'debt': debt})
 
 def search_debts(request):
