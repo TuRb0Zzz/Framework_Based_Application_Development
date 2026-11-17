@@ -10,8 +10,9 @@
     <div class="col-md-2">
         <select name="status" class="form-select">
             <option value="">Все статусы</option>
+            <option value="active" {% if status == 'active' %}selected{% endif %}>Активные</option>
             <option value="paid" {% if status == 'paid' %}selected{% endif %}>Оплаченные</option>
-            <option value="unpaid" {% if status == 'unpaid' %}selected{% endif %}>Неоплаченные</option>
+            <option value="overdue" {% if status == 'overdue' %}selected{% endif %}>Просроченные</option>
         </select>
     </div>
     <div class="col-md-2">
@@ -25,7 +26,7 @@
         </select>
     </div>
     <div class="col-md-2">
-        <button type="submit" class="btn btn-custom-black w-100">Применить</button>
+        <button type="submit" class="btn btn-custom-black w-100">Фильтр</button>
     </div>
 </form>
 
@@ -37,15 +38,18 @@
     {% for debt in debts %}
     <li class="list-group-item d-flex justify-content-between align-items-center">
         <div>
-            <a href="{% url 'debts:detail' debt.id %}" class="text-dark text-decoration-none fw-bold">
+            <a href="{{ debt.get_absolute_url }}" class="text-dark text-decoration-none fw-bold">
                 {{ debt.debtor.name }}
             </a>
-            — {{ debt.amount }} руб. ({{ debt.issue_date|date:"d.m.Y" }})
+            — {{ debt.amount }} руб.
+            {% if debt.is_large %}<span class="badge bg-warning text-dark ms-2">Крупный</span>{% endif %}
         </div>
-        {% if debt.is_paid %}
-            <span class="badge bg-success rounded-pill">Оплачен</span>
+        {% if debt.status == 'paid' %}
+            <span class="badge bg-success rounded-pill">{{ debt.get_status_display }}</span>
+        {% elif debt.status == 'active' %}
+            <span class="badge bg-primary rounded-pill">{{ debt.get_status_display }}</span>
         {% else %}
-            <span class="badge bg-danger rounded-pill">Не оплачен</span>
+            <span class="badge bg-danger rounded-pill">{{ debt.get_status_display }}</span>
         {% endif %}
     </li>
     {% empty %}

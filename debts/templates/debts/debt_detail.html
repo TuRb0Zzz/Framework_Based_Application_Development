@@ -1,22 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Детали долга{% endblock %}
 {% block content %}
-{% if error %}
-    <h2 class="text-danger">{{ error }}</h2>
-{% else %}
-    <h2>Детали долга №{{ debt.id }}</h2>
-    <ul class="list-group mb-3">
-        <li class="list-group-item"><strong>Должник:</strong> {{ debt.debtor.name }}</li>
-        <li class="list-group-item"><strong>Сумма:</strong> {{ debt.amount }} руб.</li>
-        <li class="list-group-item"><strong>Дата:</strong> {{ debt.issue_date|date:"d.m.Y" }}</li>
-        <li class="list-group-item"><strong>Статус:</strong> 
-            {% if debt.is_paid %}
-                <span class="badge bg-success">Оплачен</span>
-            {% else %}
-                <span class="badge bg-danger">Не оплачен</span>
-            {% endif %}
-        </li>
-    </ul>
-{% endif %}
+<h2>Детали долга №{{ debt.id }}</h2>
+<ul class="list-group mb-3">
+    <li class="list-group-item"><strong>Должник:</strong> {{ debt.debtor.name }}</li>
+    <li class="list-group-item"><strong>Сумма:</strong> {{ debt.amount }} руб.</li>
+    <li class="list-group-item"><strong>Дата:</strong> {{ debt.issue_date|date:"d.m.Y" }}</li>
+    <li class="list-group-item"><strong>Статус:</strong> {{ debt.get_status_display }}</li>
+    <li class="list-group-item"><strong>Крупный долг:</strong> {% if debt.is_large %}Да{% else %}Нет{% endif %}</li>
+</ul>
 <a href="{% url 'debts:list' %}" class="btn btn-custom-black">Назад к списку</a>
 {% endblock %}

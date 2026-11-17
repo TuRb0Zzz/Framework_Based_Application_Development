@@ -13,11 +13,9 @@ def debt_list(request):
     error = None
 
     if query:
-        debts = debts.filter(debtor__name__icontains=query)
-    if status == 'paid':
-        debts = debts.filter(is_paid=True)
-    elif status == 'unpaid':
-        debts = debts.exclude(is_paid=True)
+        debts = debts.filter(Q(debtor__name__icontains=query) | Q(user__name__icontains=query))
+    if status in dict(Debt.Status.choices):
+        debts = debts.filter(status=status)
 
     if date_str:
         try:
@@ -51,22 +49,24 @@ def debt_list(request):
 
 def debt_stats(request):
     debtors_stats = Debtor.objects.annotate(
-        total_amount=Sum('debts__amount', filter=Q(debts__is_paid=False)),
-        debt_count=Count('debts')
+        total_amount=Sum('debts__amount', filter=Q(debts__status=Debt.Status.ACTIVE)),
+        debt_count=Count('debts', filter=Q(debts__status=Debt.Status.ACTIVE))
     ).order_by('-total_amount')
 
-    total_all_debts = Debt.objects.aggregate(total=Sum('amount'))['total'] or 0
-    unpaid_count = Debt.objects.filter(is_paid=False).count()
+    total_all = Debt.objects.aggregate(total=Sum('amount'))['total'] or 0
+    active_count = Debt.objects.active().count()
+    paid_count = Debt.objects.paid().count()
 
     context = {
         'statistics': debtors_stats,
-        'total_all': total_all_debts,
-        'unpaid_count': unpaid_count,
+        'total_all': total_all,
+        'active_count': active_count,
+        'paid_count': paid_count,
     }
     return render(request, 'debts/stats.html', context)
 
-def debt_detail(request, debt_id):
-    debt = get_object_or_404(Debt.objects.select_related('debtor', 'user'), pk=debt_id)
+def debt_detail(request, slug):
+    debt = get_object_or_404(Debt.objects.select_related('debtor', 'user'), slug=slug)
     return render(request, 'debts/debt_detail.html', {'debt': debt})
 
 def search_debts(request):
